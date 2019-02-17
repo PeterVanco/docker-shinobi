@@ -24,10 +24,10 @@ sudo apt-get install -y git-core python3 python3-pip
 sudo pip3 install docker-compose
 ```
 
-Checkout the repo
+Checkout this the repo
 
 ```
-git clone https://github.com/idlerun/docker-shinobi.git
+git clone https://github.com/PeterVanco/docker-shinobi
 ```
 
 ## Usage
@@ -35,7 +35,7 @@ git clone https://github.com/idlerun/docker-shinobi.git
 Create containers:
 
 ```
-cd docker-shinobi/debian
+cd docker-shinobi
 docker-compose up -d --build
 ```
 
@@ -44,7 +44,7 @@ Log in:
 ```
 Web Address : http://xxx.xxx.xxx.xxx:8080/super
 Username : admin@shinobi.video
-Password : admin
+Password : administrator
 ```
 
 More info here: https://shinobi.video/docs/start#content-docker
