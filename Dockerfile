@@ -1,9 +1,6 @@
-#
-# Builds a custom docker image for ShinobiCCTV Pro
-#
-FROM node:8-alpine 
+FROM arm32v7/node:8-slim
 
-LABEL Author="MiGoller"
+LABEL Author="MiGoller, PeterVanco"
 
 # Set environment variables to default values
 ENV ADMIN_USER=admin@shinobi.video \
@@ -23,31 +20,29 @@ RUN mkdir -p /opt/shinobi
 
 WORKDIR /opt/shinobi
 
+# Raspberry Pi specific ffmpeg static build
+# from https://github.com/idlerun/ffmpeg-raspi
+
+# ADD ffmpeg.rpi /usr/bin/ffmpeg
+
+# # Install package dependencies
+# RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
+#     && apt-get update \
+#     && apt-get install -y python pkg-config libcairo-dev make g++ libjpeg-dev git mysql-client \
+#     && apt-get clean
+
 # Install package dependencies
-RUN apk add --update --no-cache ffmpeg python pkgconfig cairo-dev make g++ jpeg-dev git ttf-freefont mysql-client wget tar xz
-# To-DO: Alpine ffmpeg is missing configuration "--enable-libfreetype"
-
-# Install ffmpeg static build version
-RUN wget https://s3.amazonaws.com/cloudcamio/ffmpeg-release-64bit-static.tar.xz
-
-RUN tar xpvf ./ffmpeg-release-64bit-static.tar.xz -C ./ \
-    && cp -f ./ffmpeg-3.3-64bit-static/ff* /usr/bin/ \
-    && chmod +x /usr/bin/ff*
-
-RUN rm -f ffmpeg-release-64bit-static.tar.xz \
-    && rm -rf ./ffmpeg-3.3-64bit-static
+RUN apt-get update \
+    && apt-get install -y python pkg-config libcairo-dev make g++ libjpeg-dev git mysql-client ffmpeg \
+    && apt-get clean
 
 # Clone the Shinobi CCTV PRO repo
-RUN mkdir master_temp
-RUN git clone https://github.com/ShinobiCCTV/Shinobi.git master_temp
-RUN cp -R -f master_temp/* .
-RUN rm -rf $distro master_temp
+RUN git clone https://gitlab.com/Shinobi-Systems/Shinobi .
 
 # Install NodeJS dependencies
 RUN npm install pm2 -g
 
-RUN npm install && \
-    npm install canvas@1.6.5 moment --unsafe-perm
+RUN npm install
 
 # Copy code
 COPY docker-entrypoint.sh .
@@ -63,6 +58,10 @@ VOLUME ["/opt/shinobi/videos"]
 VOLUME ["/config"]
 
 EXPOSE 8080
+
+# Set the user to use when running this image
+# See docker-entrypoint.sh on how to change the uid/gid of the user.
+#USER node
 
 ENTRYPOINT ["/opt/shinobi/docker-entrypoint.sh"]
 

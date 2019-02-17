@@ -1,12 +1,12 @@
 version: '2'
 services:
   db:
-    image: mysql
+    image: hypriot/rpi-mysql
     env_file:
       - MySQL.env
     volumes:
       - ./datadir:/var/lib/mysql
-  web:
+  shinobi:
     build: .
     env_file:
       - MySQL.env
