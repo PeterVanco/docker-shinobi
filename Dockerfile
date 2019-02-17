@@ -38,6 +38,8 @@ RUN git clone https://gitlab.com/Shinobi-Systems/Shinobi . && \
     npm install pm2 -g && \
     npm install
 
+RUN npm install canvas@1.6.5 moment --unsafe-perm
+
 # Copy code
 COPY docker-entrypoint.sh pm2Shinobi.yml ./
 
