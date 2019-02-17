@@ -34,8 +34,8 @@ RUN apt-get update \
     && apt-get clean
 
 # merge RUNs after things start working
-RUN git clone https://gitlab.com/Shinobi-Systems/Shinobi . \
-    npm install pm2 -g \
+RUN git clone https://gitlab.com/Shinobi-Systems/Shinobi . && \
+    npm install pm2 -g && \
     npm install
 
 # Copy code
