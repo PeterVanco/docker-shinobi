@@ -12,11 +12,8 @@ ENV ADMIN_USER=admin@shinobi.video \
     MOTION_HOST=localhost \ 
     MOTION_PORT=8080 
 
-# Create the custom configuration dir
-RUN mkdir -p /config
-
-# Create the working dir
-RUN mkdir -p /opt/shinobi
+# Create custom and work dir
+RUN mkdir -p /config /opt/shinobi
 
 WORKDIR /opt/shinobi
 
@@ -36,32 +33,25 @@ RUN apt-get update \
     && apt-get install -y python pkg-config libcairo-dev make g++ libjpeg-dev git mysql-client ffmpeg \
     && apt-get clean
 
-# Clone the Shinobi CCTV PRO repo
-RUN git clone https://gitlab.com/Shinobi-Systems/Shinobi .
-
-# Install NodeJS dependencies
-RUN npm install pm2 -g
-
-RUN npm install
+# merge RUNs after things start working
+RUN git clone https://gitlab.com/Shinobi-Systems/Shinobi . \
+    npm install pm2 -g \
+    npm install
 
 # Copy code
-COPY docker-entrypoint.sh .
-COPY pm2Shinobi.yml .
+COPY docker-entrypoint.sh pm2Shinobi.yml ./
+
+# this should happen in the repository, not docker image :/
 RUN chmod -f +x ./*.sh
 
 # Copy default configuration files
-COPY ./config/conf.sample.json /opt/shinobi/conf.sample.json
-COPY ./config/super.sample.json /opt/shinobi/super.sample.json
-COPY ./config/motion.conf.sample.json /opt/shinobi/plugins/motion/conf.sample.json
+COPY config ./
+COPY plugins ./plugins/
 
 VOLUME ["/opt/shinobi/videos"]
 VOLUME ["/config"]
 
 EXPOSE 8080
-
-# Set the user to use when running this image
-# See docker-entrypoint.sh on how to change the uid/gid of the user.
-#USER node
 
 ENTRYPOINT ["/opt/shinobi/docker-entrypoint.sh"]
 
